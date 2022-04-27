@@ -15,4 +15,21 @@ describe Parser do
       expect(result.keys).to eq(expected_result)
     end
   end
+
+  it "should collect players for each match" do
+    expected_result = {
+      "game_1" => { "players" => ["Isgalamido"] },
+      "game_2" => { "players" => ["Isgalamido", "Dono da Bola", "Mocinha"] },
+      "game_3" => { "players" => ["Dono da Bola", "Mocinha", "Isgalamido", "Zeh"] },
+      "game_4" => { "players" => ["Dono da Bola", "Isgalamido", "Zeh", "Assasinu Credi"] },
+      "game_5" => { "players" => ["Isgalamido", "Oootsimo", "Dono da Bola", "Assasinu Credi", "Zeh", "Mal"] }
+    }
+
+    parser = Parser.new(log_file: SAMPLE_LOG)
+    result = parser.parse
+
+    expected_result.each do |key, value|
+      expect(result[key]["players"]).to eq(expected_result[key]["players"])
+    end
+  end
 end
