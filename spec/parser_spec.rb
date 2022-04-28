@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 SAMPLE_LOG = File.join(File.dirname(__FILE__), "stubs", "sample_log.log")
+SIMPLE_KILL_LOG = File.join(File.dirname(__FILE__), "stubs", "simple_kill_log.log")
+WORLD_KILL_LOG = File.join(File.dirname(__FILE__), "stubs", "world_kill_log.log")
 
 describe Parser do
   describe "#parse" do
@@ -25,11 +27,49 @@ describe Parser do
       "game_5" => { "players" => ["Isgalamido", "Oootsimo", "Dono da Bola", "Assasinu Credi", "Zeh", "Mal"] }
     }
 
-    parser = Parser.new(log_file: SAMPLE_LOG)
-    result = parser.parse
+    result = Parser.new(log_file: SAMPLE_LOG).parse
 
     expected_result.each do |key, value|
       expect(result[key]["players"]).to eq(expected_result[key]["players"])
     end
+  end
+
+  it "should collect kill data by players for each match" do
+    expected_result = {
+      "game_2" => {
+        "kills" => {
+          "Isgalamido" => 1,
+          "Dono da Bola" => 1
+        }
+      }
+    }
+
+    result = Parser.new(log_file: SIMPLE_KILL_LOG).parse
+
+    expected_result.each do |key, value|
+      expect(result[key]["kills"]).to eq(expected_result[key]["kills"])
+    end
+  end
+
+  it "should correctly handle <world> kills" do
+    expected_result = {
+      "game_2" => {
+        "kills" => {
+          "Isgalamido" => -2,
+          "Dono da Bola" => 1
+        }
+      }
+    }
+
+    result = Parser.new(log_file: WORLD_KILL_LOG).parse
+
+    expected_result.each do |key, value|
+      expect(result[key]["kills"]).to eq(expected_result[key]["kills"])
+    end
+  end
+
+  it "should correctly count total kills" do
+    result = Parser.new(log_file: WORLD_KILL_LOG).parse
+    expect(result["game_2"]["total_kills"]).to eq(5)
   end
 end
