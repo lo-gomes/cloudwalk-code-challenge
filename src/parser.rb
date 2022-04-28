@@ -41,7 +41,10 @@ class Parser
   end
 
   def extract_kill(line, game)
-    players = line.split("by")[0].split(":").reverse[0].split("killed").map { |player| player.strip }
+    line_split = line.split("by")
+
+    reason = line_split.reverse[0].strip
+    players = line_split[0].split(":").reverse[0].split("killed").map { |player| player.strip }
 
     if players[0] == WORLD_PLAYER
       game["kills"][players[1]] = 0 if not game["kills"].include?(players[1])
@@ -50,6 +53,9 @@ class Parser
       game["kills"][players[0]] = 0 if not game["kills"].include?(players[0])
       game["kills"][players[0]] += 1
     end
+
+    game["kills_by_means"][reason] = 0 if not game["kills_by_means"].include?(reason)
+    game["kills_by_means"][reason] += 1
 
     game["total_kills"] += 1
   end

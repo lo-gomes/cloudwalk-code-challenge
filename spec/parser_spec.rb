@@ -3,6 +3,7 @@
 SAMPLE_LOG = File.join(File.dirname(__FILE__), "stubs", "sample_log.log")
 SIMPLE_KILL_LOG = File.join(File.dirname(__FILE__), "stubs", "simple_kill_log.log")
 WORLD_KILL_LOG = File.join(File.dirname(__FILE__), "stubs", "world_kill_log.log")
+KILLS_BY_MEANS_LOG = File.join(File.dirname(__FILE__), "stubs", "kills_by_means_log.log")
 
 describe Parser do
   describe "#parse" do
@@ -71,5 +72,20 @@ describe Parser do
   it "should correctly count total kills" do
     result = Parser.new(log_file: WORLD_KILL_LOG).parse
     expect(result["game_2"]["total_kills"]).to eq(5)
+  end
+
+  it "should correctly count kills by means" do
+    expected_result = {
+      "game_2" => {
+        "kills_by_means" => {
+          "MOD_SHOTGUN" => 10,
+          "MOD_RAILGUN" => 2,
+          "MOD_ROCKET_SPLASH" => 3
+        }
+      }
+    }
+
+    result = Parser.new(log_file: KILLS_BY_MEANS_LOG).parse
+    expect(result["game_2"]["kills_by_means"]).to eq(expected_result["game_2"]["kills_by_means"])
   end
 end
